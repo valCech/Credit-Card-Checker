@@ -22,84 +22,80 @@ const mystery5 = [4, 9, 1, 3, 5, 4, 0, 4, 6, 3, 0, 7, 2, 5, 2, 3];
 // An array of all the arrays above
 const batch = [valid1, valid2, valid3, valid4, valid5, invalid1, invalid2, invalid3, invalid4, invalid5, mystery1, mystery2, mystery3, mystery4, mystery5];
 
-//return the doubled value of the number, if over 9 after doubling, then subtract 9 and that will be the returned value.
-const getConvertedVal = (arr, i, value, dbldvlue) => {
-  dbldvlue = arr[i] * 2;
-  value = dbldvlue;
-  if(dbldvlue > 9) {
-    dbldvlue -= 9;
-    value = dbldvlue;
-  }
-  return(value);
-};
 
-
-const validateCred = (arr) => {
-  let sum = 0;
-
-  //loop through each indivual number on the card and calculate if the whole number is invalid. return true if valid, false if not.
-  for(let i = arr.length - 1; i >= 0; i--) {
-    let value = arr[i]; //get values for credit card individual numbers that don't need to be calculated (every other number)
-    if(arr.length % 2 === 0) { //get values for credit card individual numbers that need to be calculated for even number placements of credit cards.
-      if(i % 2 === 0) {
-       value = getConvertedVal(arr, i);  
-      }
-    } else {
-        if(i % 2 != 0) {  //get values for credit card individual numbers that need to be calculated for odd number placements of credit cards.
-          value = getConvertedVal(arr, i);
-      }
+// Add your functions below:
+function validateCred(arr) {                    // function to validate credit card number
+  let total = 0;                                // variable to store sum of digits
+  for (let i = arr.length - 1; i >= 0; i--) {   // loop through array backwards
+    let currValue = arr[i]                      // variable to store current value
+    if ((i % 2) === 0) {                        // if index is even
+      currValue *= 2;                           // multiply current value by 2
+      if (currValue > 9) {                      // if current value is greater than 9 
+        currValue -= 9;                         // subtract 9 from current value
+      }                  
     }
-    sum += value;
+    total += currValue;                         // add current value to total
   }
-    if(sum % 10 === 0) { //if sum is divided by 10 === 0  then numbers are valid, if not, the numbers are invalid.
-      return true;
-    } else {
-      return false;
-    }
+    return total % 10 === 0;                    // return true if total is divisible by 10   
 };
 
-console.log
-//put in an array of all invalid and valid credit card numbers.  Send each card number to validateCred and return and array of invalid numbers.
-const findInvalidCards = (arrs) => {
-  const invalidNums = arrs.filter(arr => !validateCred(arr));
-  return invalidNums;
-};
+// Test functions:
+console.log(validateCred(valid1)); // Should print true
+console.log(validateCred(invalid1)); // Should print false
 
-// Put in the everything array of all numbers and return the array of invalid cards.
-const arrOfInvalidNums = findInvalidCards(batch);
+function findInvalidCards(cards) {             // function to find invalid cards
+  const invalid = [];                          // array to store invalid cards
 
-//put in array of invalid credit card numbers and return arr of companies that issued the card.
-const idInvalidCardCompanies = (invalidArrs) => {
-  let company = "";
-  const invalidCompanies = [];
-  for(let i = 0; i < invalidArrs.length; i++) {
-    const firstDigit = invalidArrs[i][0]; //Identify company by knowing which number the card starts with.
-    switch(firstDigit) {
-      case 3:
-        company = 'Amex (American Express)';
-        break;
+  for (let i = 0; i < cards.length; i++) {     // loop through array of cards
+    let currCred = cards[i];                   // variable to store current card
+    if (!validateCred(currCred)) {             // if current card is invalid
+      invalid.push(currCred);                  // push current card to invalid array
+    }   
+  }
+
+  return invalid;                              // return invalid cards
+}
+
+// Test function
+console.log(findInvalidCards([valid1, valid2, valid3, valid4, valid5]));// Shouldn't print anything
+console.log(findInvalidCards([invalid1, invalid2, invalid3, invalid4, invalid5])); // Should print all of the numbers
+
+console.log(findInvalidCards(batch));             // Test what the mystery numbers are
+
+function idInvalidCardCompanies(invalidBatch) {   // function to identify invalid card companies
+  const companies = [];                           // array to store invalid card companies
+  for (let i = 0; i < invalidBatch.length; i++) { // loop through invalid cards
+    switch (invalidBatch[i][0]) {                 // switch statement to identify invalid card company
+      case 3:                                     // if first digit is 3
+        if (companies.indexOf('Amex') === -1) {   // if Amex is not in companies array
+          companies.push('Amex');                 // push Amex to companies array
+        }
+        break
       case 4:
-        company = 'Visa';
-        break;
+        if (companies.indexOf('Visa') === -1) {
+          companies.push('Visa');
+        }
+        break
       case 5:
-        company = 'Mastercard';
-        break;
+        if (companies.indexOf('Mastercard') === -1) {
+          companies.push('Mastercard');
+        }
+        break
       case 6:
-        company = 'Discover';
-        break;
+        if (companies.indexOf('Discover') === -1) {
+          companies.push('Discover');
+        }
+        break
       default:
-        company = 'Company not found';
-      }
-    invalidCompanies.push(company);
-  }
-
-  //put in array of invalid companies, take out duplicates and return array of invalid companies without duplicates.
-  function onlyUnique(value, index, self) { //filter out duplicate companies.
-    return self.indexOf(value) === index;
+        console.log('Company not found');
     }
-    
-  const uniqueInvalidCompanies = invalidCompanies.filter(onlyUnique);
-    return uniqueInvalidCompanies; 
-};
+  }
+  return companies;
+}
 
- console.log(idInvalidCardCompanies(arrOfInvalidNums));
+console.log(idInvalidCardCompanies([invalid1])); // Should print['visa']
+console.log(idInvalidCardCompanies([invalid2])); // Should print ['mastercard']
+console.log(idInvalidCardCompanies(batch)); // Find out which companies have mailed out invalid cards
+
+
+
